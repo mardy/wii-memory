@@ -106,6 +106,15 @@ int main(int argc, char **argv) {
 
         if (step == 30) {
             check_log();
+            /* Figure how how much we can allocate in MEM1 */
+            size_t mem1_free = SYS_GetArenaHi() - SYS_GetArenaLo();
+            void *mem1_all = try_allocate(mem1_free - 0x1000); /* remove 4K for newlib structs */
+            /* Allocate some more, so taht MEM2 is used too */
+            void *mem2_some = try_allocate(1*1024*1024);
+            try_free(mem2_some);
+            try_free(mem1_all);
+            mem_report();
+
             void *mem1_10mb = try_allocate(10*1024*1024);
             /* This will get allocated in MEM2: */
             void *mem2_20mb = try_allocate(20*1024*1024);
